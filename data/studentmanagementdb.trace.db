@@ -1,0 +1,19 @@
+2026-10-18 14:55:36.840522+03:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STUDENTS" not found; SQL statement:
+INSERT INTO students (id, name, student_number)
+VALUES
+(1, 'Reza', '1001'),
+(2, 'Mohammad', '1002'),
+(3, 'Nima', '1003') [42102-240]
+2026-10-18 14:59:39.751405+03:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM SUBJECTS SUBJECT [*]SUBJECTS"; SQL statement:
+SELECT * FROM SUBJECTS SUBJECT SUBJECTS [42000-240]
+2026-10-18 15:01:04.118973+03:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]STUDENTS"; expected "SAVEPOINT, SCRIPT, SHUTDOWN"; SQL statement:
+STUDENTS [42001-240]
+2026-10-18 15:57:33.961066+03:30 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM MASTERS STUDENT [*]STUDENTS STUDENTS"; SQL statement:
+SELECT * FROM MASTERS STUDENT STUDENTS STUDENTS [42000-240]
+2026-10-18 16:00:03.996137+03:30 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]STUDENT"; expected "SAVEPOINT, SCRIPT, SHUTDOWN"; SQL statement:
+STUDENT [42001-240]
