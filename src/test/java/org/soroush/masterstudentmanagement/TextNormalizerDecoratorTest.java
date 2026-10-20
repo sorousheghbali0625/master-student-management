@@ -1,13 +1,18 @@
 
-package org.soroush.masterstudentmanagement.normalization;
+package org.soroush.masterstudentmanagement;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.soroush.masterstudentmanagement.normalization.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TextNormalizerDecoratorTest {
 
-    private TextNormalizer createNormalizer() {
+    private TextNormalizer textNormalizer;
+
+    @BeforeEach
+    void setUp() {
 
         TextNormalizer normalizer =
                 new IdentityTextNormalizer();
@@ -21,90 +26,102 @@ class TextNormalizerDecoratorTest {
         normalizer =
                 new SpacesNormalizerDecorator(normalizer);
 
-        return new UnicodeNfcDecorator(normalizer);
+        textNormalizer =
+                new UnicodeNfcDecorator(normalizer);
     }
 
     @Test
     void shouldNormalizeAllFeatures() {
 
-        TextNormalizer normalizer = createNormalizer();
-
-        String result = normalizer.normalize(
+        String result = textNormalizer.normalize(
                 "  رياضي   كاربردي  ١ و 2  "
         );
 
-        assertEquals("ریاضی کاربردی ۱ و ۲", result);
+        assertEquals(
+                "ریاضی کاربردی ۱ و ۲",
+                result
+        );
     }
 
     @Test
     void shouldNormalizeOnlyDigits() {
 
-        TextNormalizer normalizer =
+        TextNormalizer digitsNormalizer =
                 new DigitsNormalizerDecorator(
                         new IdentityTextNormalizer()
                 );
 
         assertEquals(
                 "Math ۱۲۳",
-                normalizer.normalize("Math 123")
+                digitsNormalizer.normalize("Math 123")
         );
     }
 
     @Test
     void shouldNormalizeOnlySpaces() {
 
-        TextNormalizer normalizer =
+        TextNormalizer spacesNormalizer =
                 new SpacesNormalizerDecorator(
                         new IdentityTextNormalizer()
                 );
 
         assertEquals(
                 "ریاضی پیشرفته",
-                normalizer.normalize("  ریاضی    پیشرفته  ")
+                spacesNormalizer.normalize(
+                        "  ریاضی    پیشرفته  "
+                )
+        );
+    }
+
+    @Test
+    void shouldNormalizeArabicLetters() {
+
+        TextNormalizer lettersNormalizer =
+                new ArabicLettersDecorator(
+                        new IdentityTextNormalizer()
+                );
+
+        assertEquals(
+                "ریاضی کاربردی",
+                lettersNormalizer.normalize("رياضي كاربردي")
         );
     }
 
     @Test
     void shouldPreserveHalfSpace() {
 
-        TextNormalizer normalizer = createNormalizer();
-
         assertEquals(
                 "نرم\u200Cافزار",
-                normalizer.normalize("نرم\u200Cافزار")
+                textNormalizer.normalize("نرم\u200Cافزار")
         );
     }
 
     @Test
     void shouldHandleNullInput() {
 
-        TextNormalizer normalizer = createNormalizer();
+        assertNull(textNormalizer.normalize(null));
+    }
 
-        assertNull(normalizer.normalize(null));
+    @Test
+    void shouldHandleEmptyString() {
+
+        assertEquals(
+                "",
+                textNormalizer.normalize("")
+        );
     }
 
     @Test
     void shouldBeIdempotent() {
 
-        TextNormalizer normalizer = createNormalizer();
+        String once = textNormalizer.normalize(
+                "  رياضي  ١ "
+        );
 
-        String once = normalizer.normalize("  رياضي  ١ ");
-
-        String twice = normalizer.normalize(once);
+        String twice = textNormalizer.normalize(once);
 
         assertEquals(once, twice);
     }
 
-    @Test
-    void shouldMatchOldNormalizer() {
-
-        TextNormalizer normalizer = createNormalizer();
-
-        String input = "  رياضي   كاربردي  ١ و 2  ";
-
-        assertEquals(
-                PersianTextNormalizer.normalize(input),
-                normalizer.normalize(input)
-        );
-    }
+    
 }
