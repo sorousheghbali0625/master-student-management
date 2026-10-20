@@ -6,7 +6,7 @@ import org.soroush.masterstudentmanagement.dto.CreateStudentRequest;
 import org.soroush.masterstudentmanagement.dto.StudentResponse;
 import org.soroush.masterstudentmanagement.model.Student;
 import org.soroush.masterstudentmanagement.model.Subject;
-import org.soroush.masterstudentmanagement.normalization.PersianTextNormalizer;
+import org.soroush.masterstudentmanagement.normalization.TextNormalizer;
 import org.soroush.masterstudentmanagement.repository.StudentRepository;
 import org.soroush.masterstudentmanagement.repository.SubjectRepository;
 
@@ -24,6 +24,8 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
+    private final TextNormalizer textNormalizer;
+
 
 
     @Transactional
@@ -55,7 +57,7 @@ public class StudentService {
         }
 
         String name = request.name().trim();
-        String normalized = PersianTextNormalizer.normalize(name);
+        String normalized = textNormalizer.normalize(name);
         String studentNumber = request.studentNumber().trim();
 
         if (studentRepository.existsByStudentNumber(studentNumber)) {

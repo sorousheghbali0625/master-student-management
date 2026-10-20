@@ -8,7 +8,7 @@ import org.soroush.masterstudentmanagement.model.Master;
 import org.soroush.masterstudentmanagement.model.Student;
 import org.soroush.masterstudentmanagement.model.Subject;
 
-import org.soroush.masterstudentmanagement.normalization.PersianTextNormalizer;
+import org.soroush.masterstudentmanagement.normalization.TextNormalizer;
 import org.soroush.masterstudentmanagement.repository.MasterRepository;
 import org.soroush.masterstudentmanagement.repository.SubjectRepository;
 
@@ -26,6 +26,8 @@ public class SubjectService {
 
     private final SubjectRepository subjectRepository;
     private final MasterRepository masterRepository;
+    private final TextNormalizer textNormalizer;
+
 
 
     @Transactional
@@ -55,7 +57,7 @@ public class SubjectService {
 
         // 3. Normalize title
         String normalizedTitle =
-                PersianTextNormalizer.normalize(request.title());
+                textNormalizer.normalize(subject.getTitle());
 
         if (normalizedTitle == null || normalizedTitle.isBlank()) {
             throw new ResponseStatusException(
@@ -115,7 +117,7 @@ public class SubjectService {
                         HttpStatus.NOT_FOUND,
                         "Master not found: " + masterId
                 ));
-        String normalizedTitle = PersianTextNormalizer.normalize(subject.getTitle());
+        String normalizedTitle = textNormalizer.normalize(subject.getTitle());
         Subject newSubject = new Subject(
                 normalizedTitle,
                 subject.getUnits(),
