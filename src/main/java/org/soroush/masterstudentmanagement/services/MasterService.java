@@ -2,6 +2,7 @@
 package org.soroush.masterstudentmanagement.services;
 
 import lombok.RequiredArgsConstructor;
+import org.soroush.masterstudentmanagement.exception.ResourceNotFoundException;
 import org.soroush.masterstudentmanagement.model.Master;
 import org.soroush.masterstudentmanagement.model.Student;
 import org.soroush.masterstudentmanagement.model.Subject;
@@ -32,9 +33,8 @@ public class MasterService {
     public List<Subject> getMastersSubjects(Long masterId) {
 
         Master master = masterRepository.findById(masterId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Master not found: " + masterId
+                .orElseThrow(() ->  new ResourceNotFoundException(
+                        "Master with ID " + masterId + " not found"
                 ));
 
         return List.copyOf(master.getSubjects());
@@ -44,9 +44,8 @@ public class MasterService {
     public List<Student> getMastersStudents(Long masterId) {
 
         Master master = masterRepository.findById(masterId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Master not found: " + masterId
+                .orElseThrow(() ->  new ResourceNotFoundException(
+                        "Master with ID " + masterId + " not found"
                 ));
 
         Set<Student> students = master.getSubjects()

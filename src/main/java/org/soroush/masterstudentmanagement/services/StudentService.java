@@ -9,14 +9,17 @@ import org.soroush.masterstudentmanagement.model.Subject;
 import org.soroush.masterstudentmanagement.normalization.TextNormalizer;
 import org.soroush.masterstudentmanagement.repository.StudentRepository;
 import org.soroush.masterstudentmanagement.repository.SubjectRepository;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.HashSet;
 import java.util.List;
+import org.soroush.masterstudentmanagement.exception.ResourceNotFoundException;
+import org.soroush.masterstudentmanagement.exception.DuplicateResourceException;
+import org.soroush.masterstudentmanagement.exception.InvalidOperationException;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -61,9 +64,8 @@ public class StudentService {
         String studentNumber = request.studentNumber().trim();
 
         if (studentRepository.existsByStudentNumber(studentNumber)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Student number already exists"
+            throw new DuplicateResourceException(
+                    "Student number is already registered"
             );
         }
 
@@ -98,8 +100,7 @@ public class StudentService {
         Subject subject = findSubject(subjectId);
 
         if (student.getSubjects().contains(subject)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new DuplicateResourceException(
                     "Student has already selected this subject"
             );
         }
@@ -114,8 +115,7 @@ public class StudentService {
         Subject subject = findSubject(subjectId);
 
         if (!student.getSubjects().contains(subject)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new InvalidOperationException(
                     "Student has not selected this subject"
             );
         }
@@ -125,17 +125,15 @@ public class StudentService {
 
     private Student findStudent(Long studentId) {
         return studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Student not found: " + studentId
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student with ID " + studentId + " not found"
                 ));
     }
 
     private Subject findSubject(Long subjectId) {
         return subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Subject not found: " + subjectId
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student with ID " + subjectId + " not found"
                 ));
     }
 }

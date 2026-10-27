@@ -7,7 +7,9 @@ import org.soroush.masterstudentmanagement.dto.UpdateSubjectRequest;
 import org.soroush.masterstudentmanagement.model.Master;
 import org.soroush.masterstudentmanagement.model.Student;
 import org.soroush.masterstudentmanagement.model.Subject;
-
+import org.soroush.masterstudentmanagement.exception.ResourceNotFoundException;
+import org.soroush.masterstudentmanagement.exception.DuplicateResourceException;
+import org.soroush.masterstudentmanagement.exception.InvalidOperationException;
 import org.soroush.masterstudentmanagement.normalization.TextNormalizer;
 import org.soroush.masterstudentmanagement.repository.MasterRepository;
 import org.soroush.masterstudentmanagement.repository.SubjectRepository;
@@ -37,9 +39,8 @@ public class SubjectService {
 
         // 1. Find existing subject
         Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Subject not found: " + subjectId
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Subject with ID " + subjectId + " not found"
                 ));
 
         // 2. Validate request
@@ -49,8 +50,8 @@ public class SubjectService {
                 || request.units() <= 0
                 || request.masterId() == null) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new InvalidOperationException(
+
                     "Invalid subject data"
             );
         }
@@ -113,9 +114,8 @@ public class SubjectService {
         Long masterId = subject.getMaster().getId();
 
         Master master = masterRepository.findById(masterId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Master not found: " + masterId
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Master with ID " + masterId + " not found"
                 ));
         String normalizedTitle = textNormalizer.normalize(subject.getTitle());
         Subject newSubject = new Subject(
@@ -131,9 +131,8 @@ public class SubjectService {
     public void deleteSubject(Long subjectId) {
 
         Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Subject not found: " + subjectId
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Subject with ID " + subjectId + " not found"
                 ));
 
         for (Student student : new HashSet<>(subject.getStudents())) {
